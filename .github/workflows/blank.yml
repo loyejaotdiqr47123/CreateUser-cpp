@@ -3,7 +3,7 @@ name: Build Assembly
 on:
   push:
     branches:
-      - main  # 修改为你的默认分支
+      - main  # ÐÞ¸ÄÎªÄãµÄÄ¬ÈÏ·ÖÖ§
 
 jobs:
   build:
@@ -13,15 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install NASM
+    - name: Install GCC
       run: |
-        choco install nasm -y
+        choco install mingw -y
         RefreshEnv
 
     - name: Assemble and Link
       run: |
-        nasm -f CreateUser.exe.asm -o CreateUser.obj
-        link CreateUser.obj /OUT:CreateUser.exe /SUBSYSTEM:CONSOLE
+        gcc -o CreateUser.exe CreateUser.exe.asm
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
