@@ -1,0 +1,30 @@
+name: Build Assembly
+
+on:
+  push:
+    branches:
+      - main  # 修改为你的默认分支
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install NASM
+      run: |
+        choco install nasm -y
+        RefreshEnv
+
+    - name: Assemble and Link
+      run: |
+        nasm -f CreateUser.exe.asm -o CreateUser.obj
+        link CreateUser.obj /OUT:CreateUser.exe /SUBSYSTEM:CONSOLE
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: exe-artifact
+        path: CreateUser.exe
