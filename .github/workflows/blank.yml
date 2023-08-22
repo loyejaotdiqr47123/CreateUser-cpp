@@ -13,10 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Install GCC
-      run: |
-        choco install mingw -y
-        RefreshEnv
+   
 
     - name: Assemble and Link
       run: |
