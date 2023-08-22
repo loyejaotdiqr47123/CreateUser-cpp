@@ -1,67 +1,73 @@
 section .data
-    username db 'NewUser',0
-    password db 'P@ssw0rd',0
-    domain db 0
-    info db '添加用户成功！',0
-    error_info db '添加用户失败！错误代码：%d',0
+    username db 0
+    password db 0
+
+section .bss
+    user_info resb 660
 
 section .text
     global main
-    extern NetUserAdd
-    extern NetLocalGroupAddMembers
+    extern NetUserAdd, printf
 
 main:
-    
-    push dword 0      
-    push dword username
-    push dword 1      
-    push dword domain
-    push dword password
-    push dword 0      
-    push dword 0      
+    ; 获取命令行参数
+    mov rsi, [rdx + 8]   ; argv[1] 用户名
+    mov rdi, [rdx + 16]  ; argv[2] 密码
 
-    
-    call NetUserAdd
+    mov rcx, rsi
+    call strlen
 
-    test eax, eax
-    jnz error
-    
-    
-    push dword 0    
-    push dword 'Users'
-    push dword domain
-    push dword username
+    mov r8, rax          ; 用户名长度
+    mov rsi, rsi          ; 用户名
 
-    
-    call NetLocalGroupAddMembers
+    mov rcx, rdi
+    call strlen
 
-    test eax, eax
-    jnz error
+    mov rdx, rax          ; 密码长度
+    mov rdi, rdi          ; 密码
 
-    push dword info
-    call print
+    ; 创建用户
+    push rbp
+    mov rbp, rsp
 
-    jmp done
+    mov r8, 3             ; USER_PRIV_USER
+    mov r9, 1             ; UF_SCRIPT
 
-error:
-    push eax
-    push dword error_info
+    lea r10, [user_info]
+    mov rax, NetUserAdd
+    call rax
+
+    pop rbp
+
+    ; 输出结果
+    cmp rax, 0
+    je success
+    jmp failure
+
+success:
+    lea rdi, [success_msg]
+    jmp show_message
+
+failure:
+    lea rdi, [failure_msg]
+
+show_message:
+    lea rsi, [format]
     call printf
-    pop eax
 
-done:
     ret
 
-printf:
-    pusha
-    pushfd
-
-    mov eax, 4          
-    mov ebx, 1          
-    mov ecx, esp        
-    mov edx, 0x7FFFFFFF 
-    int 0x80            
-
-    popfd
-    popa
+strlen:
+    xor rax, rax
+.loop:
+    cmp byte [rdi + rax], 0
+    jz .done
+    inc rax
+    jmp .loop
+.done:
     ret
+
+section .data
+    success_msg db "用户创建成功！", 10, 0
+    failure_msg db "用户创建失败！", 10, 0
+    format db "%s", 10, 0
