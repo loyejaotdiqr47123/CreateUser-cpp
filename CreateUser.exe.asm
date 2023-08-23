@@ -4,13 +4,14 @@ section .data
     fail_msg db '用户开通失败！', 0
     user GROUP  db 'users', 0
     nerr equ 2226 ;Error code for user already exist
+    invalid_args_msg db '参数错误！', 0
 
 section .text
     global _start
 
 _start:
     ; 检查命令行参数
-    cmp dword [esp+4], 3
+    cmp dword [esp+4], DWORD 3
     jne invalid_args
 
     ; 获取用户名和密码
