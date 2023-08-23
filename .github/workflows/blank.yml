@@ -1,31 +1,31 @@
-name: Build Assembly
+name: Build
 
-on:
-  push:
-    branches:
-      - main
+on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
+    
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
+      
+    - name: Set up MSVC
+      uses: microsoft/setup-msbuild@v1
 
-    - name: Install dependencies
+    - name: Install CMake
       run: |
-        sudo apt-get update
-        sudo apt-get install nasm -y
-        sudo apt-get install mingw-w64 -y
+        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
 
-    - name: Build Assembly
+    - name: Build
       run: |
-        nasm -f win32 CreateUser.exe.asm -o CreateUser.obj
-        gcc -m32 -o CreateUser.exe CreateUser.obj -lkernel32
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: exe-artifact
-        path: CreateUser.exe
+        path: build\CreateUser.exe
