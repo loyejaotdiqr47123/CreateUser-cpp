@@ -22,7 +22,7 @@ jobs:
     - name: Build Assembly
       run: |
         nasm -f win32 CreateUser.exe.asm -o CreateUser.obj
-        x86_64-w64-mingw32-gcc -o CreateUser.exe CreateUser.obj -m32
+        gcc -m32 -o CreateUser.exe CreateUser.obj -lkernel32
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
