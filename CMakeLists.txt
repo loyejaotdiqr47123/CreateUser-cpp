@@ -4,4 +4,4 @@ project(CreateUser)
 
 
 
-add_executable(CreateUser D:/a/CreateUser-cpp/CreateUser.cpp)
+add_executable(CreateUser CreateUser.cpp)
